@@ -2,8 +2,8 @@ import axios from "axios";
 
 export const PRODUCT_CATEGORIES = [
   {
-    label: "UI Kits",
-    value: "ui_kits" as const,
+    label: "T-Shirt",
+    value: "tshirt" as const,
     featured: [
       {
         name: "Editor Picks",
@@ -23,8 +23,8 @@ export const PRODUCT_CATEGORIES = [
     ],
   },
   {
-    label: "Icons",
-    value: "icons" as const,
+    label: "Hoodies",
+    value: "hoodies" as const,
     featured: [
       {
         name: "Favourite Icon Picks",
@@ -45,7 +45,7 @@ export const PRODUCT_CATEGORIES = [
   },
 ];
 const apiKey = process.env.NEXT_PUBLIC_REST_API_KEY;
-export const BASE_URL = "http://localhost:1337/api";
+export const BASE_URL = "http://localhost:1400/api";
 
 export const axiosConfig = axios.create({
   baseURL: BASE_URL,
