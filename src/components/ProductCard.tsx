@@ -73,13 +73,13 @@ const ProductCard = ({ product, index }: ProductListingProps) => {
 	return (
 		<Link
 			href={`/product/${product.id}`}
-			className={cn("group block", {
+			className={cn("group block hover:border p-1 rounded-lg border-blue-300", {
 				"visible animate-in fade-in-5": isVisible,
 			})}
 		>
 			<ImageSlider urls={validUrls} />
 			<div className="mt-1.5">
-				<p className="text-xs text-gray-500">Space Grey</p>
+				{/* <p className="text-xs text-gray-500">Space Grey</p> */}
 				<div className="mt-3 flex justify-between text-sm">
 					<div className="flex flex-col">
 						<h3 className="text-gray-900 group-hover:underline-offset-4 text">
@@ -89,7 +89,7 @@ const ProductCard = ({ product, index }: ProductListingProps) => {
 					</div>
 					<div className="flex flex-col">
 						<p></p>
-						<p className="text-gray-900">
+						<p className="text-gray-900 font-bold">
 							{formatPrice(product.attributes.price)}
 						</p>
 					</div>
