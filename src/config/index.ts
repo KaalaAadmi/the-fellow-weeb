@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const PRODUCT_CATEGORIES = [
   {
     label: "UI Kits",
@@ -42,3 +44,12 @@ export const PRODUCT_CATEGORIES = [
     ],
   },
 ];
+const apiKey = process.env.NEXT_PUBLIC_REST_API_KEY;
+export const BASE_URL = "http://localhost:1337/api";
+
+export const axiosConfig = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+  },
+});
