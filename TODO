@@ -1,0 +1,35 @@
+MAKE PAGES: @done
+  - About Us -> /about-us @done
+  - Contact Us -> /contact-us @done
+  - Privacy Policy -> /privacy-policy @done
+  - Shipping Policy -> /shipping-policy @done
+  - Returns and Cancellations Policy -> /returns-policy @done
+  - Size Guide -> /size-guide @done
+ 
+STRAPI: @done
+  - add sizes in products @done
+  - add colors in products @done
+
+GENERAL: @done
+  - Sign Up -> add fields (checkbox for privacy policy required) @done
+  - Sign In @done
+  - Privacy Policy add @done
+    - Terms and Condition add @done
+  - Shipping Policy add @done
+  - Returns and Cancellations add @done
+
+FOOTER: @done
+  - About Us @done
+  - Contact Us @done
+  - Newsletter Sign Up @done
+  - social Links @done
+    - whatsapp @done
+    - Instagram @done
+    - Facebook @done
+    - Tiktok @done  
+
+Sing Up Page:
+  - add fields like name, etc
+
+Products in HomeScreen:
+  - get latest products

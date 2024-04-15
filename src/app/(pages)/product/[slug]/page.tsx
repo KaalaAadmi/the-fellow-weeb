@@ -1,63 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
-// import { StarIcon } from '@heroicons/react/20/solid'
+import { useEffect, useState } from "react";
+import ImageMagnifier from "@/components/ImageMagnifier";
+import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import { axiosConfig } from "@/config";
+import { formatPrice } from "@/lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { Star } from "lucide-react";
-import { axiosConfig } from "@/config";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-
-const product = {
-  name: "Basic Tee 6-Pack",
-  price: "$192",
-  href: "#",
-  // breadcrumbs: [
-  //   { id: 1, name: 'Men', href: '#' },
-  //   { id: 2, name: 'Clothing', href: '#' },
-  // ],
-  images: [
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-secondary-product-shot.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-01.jpg",
-      alt: "Model wearing plain black basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-02.jpg",
-      alt: "Model wearing plain gray basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-featured-product-shot.jpg",
-      alt: "Model wearing plain white basic tee.",
-    },
-  ],
-  colors: [
-    { name: "White", class: "bg-white", selectedClass: "ring-gray-400" },
-    { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
-    { name: "Black", class: "bg-gray-900", selectedClass: "ring-gray-900" },
-  ],
-  sizes: [
-    { name: "XXS", inStock: false },
-    { name: "XS", inStock: true },
-    { name: "S", inStock: true },
-    { name: "M", inStock: true },
-    { name: "L", inStock: true },
-    { name: "XL", inStock: true },
-    { name: "2XL", inStock: true },
-    { name: "3XL", inStock: true },
-  ],
-  description:
-    'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
-  highlights: [
-    "Hand cut and sewn locally",
-    "Dyed with our proprietary colors",
-    "Pre-washed & pre-shrunk",
-    "Ultra-soft 100% cotton",
-  ],
-  details:
-    'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
-};
 
 const reviews = { href: "#", average: 4, totalCount: 117 };
 
@@ -65,17 +15,23 @@ function classNames(...classes: any): any {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+export default function ProductDetails() {
   const path = usePathname();
   const id = path.split("/")[2];
-  console.log(id);
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+  // console.log(id);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [prod, setProd] = useState({});
+  const [sizes, setSizes] = useState([]); // Define state for sizes
+  const [colors, setColors] = useState([]); // Define state for colors
+  const [validUrls, setValidUrls] = useState<string[]>([]); // State for valid image URLs
+  const allSizes = ["XXS", "XS", "S", "M", "L", "XL", "2XL", "3XL"]; // Define all offered sizes
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  // get products
   useEffect(() => {
     const getLatestProducts = async () => {
       axiosConfig
-        .get(`/products/${id}`)
+        .get(`/products/${id}?populate=*`)
         .then((res) => {
           console.log(res.data.data);
           setProd(res.data.data);
@@ -87,6 +43,57 @@ export default function Example() {
     getLatestProducts();
   }, []);
 
+  // get sizes
+  useEffect(() => {
+    const formattedSizes = allSizes.map((size) => ({
+      name: size,
+      inStock: prod?.attributes?.availableSizes?.includes(size), // Check if size exists in availableSizes
+    }));
+
+    setSizes(formattedSizes);
+  }, [prod]); // Update sizes state when data changes
+
+  // get colors
+  useEffect(() => {
+    const formattedColors = prod?.attributes?.availableColors.map((color) => ({
+      name: color.name,
+      class: color.class,
+      selectedClass: "ring-gray-400", // Initially set selectedClass to an empty string
+    }));
+    setColors(formattedColors);
+  }, [prod]); // Update colors state when data changes
+
+  // get images
+  useEffect(() => {
+    function getValidUrls() {
+      const validUris: string[] = [];
+
+      if (prod && prod.attributes && prod.attributes.images) {
+        const images = prod.attributes.images.data;
+        images.forEach((image) => {
+          if (image.attributes.url) {
+            validUris.push(image.attributes.url);
+          } else if (image.formats) {
+            const formatUrls = Object.values(image.formats).map(
+              (format) => format.url
+            );
+            validUris.push(...formatUrls);
+          }
+        });
+      }
+      setValidUrls(validUris);
+      // setIsLoadingImages(false); // Set loading state to false after fetching
+    }
+    getValidUrls();
+  }, [prod]); // Update on product change
+
+  console.log(validUrls);
+
+  const handleSelect = (index: number) => {
+    setSelectedImageIndex(index);
+  };
+
+  console.log(selectedImageIndex);
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -95,57 +102,71 @@ export default function Example() {
             role="list"
             className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8"
           >
-            <li className="text-sm">
-              <a
-                href={product.href}
-                aria-current="page"
-                className="font-medium text-gray-500 hover:text-gray-600"
-              >
-                {product.name}
-              </a>
-            </li>
+            <p
+              aria-current="page"
+              className="font-medium text-gray-500 hover:text-gray-600"
+            >
+              {prod?.attributes?.title}
+            </p>
           </ol>
         </nav>
-
-        {/* Image gallery */}
-        <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-          <div className="aspect-h-4 aspect-w-3 hidden overflow-hidden rounded-lg lg:block">
-            <img
-              src={product.images[0].src}
-              alt={product.images[0].alt}
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
-          <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-            <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
-              <img
-                src={product.images[1].src}
-                alt={product.images[1].alt}
-                className="h-full w-full object-cover object-center"
-              />
+        <MaxWidthWrapper className="mt-6">
+          <div className="w-full lg:w-3/5 px-4 mb-14 lg:mb-0">
+            <div className="flex flex-wrap justify-center -mx-2">
+              {/* Thumbnails Section */}
+              <div className="w-full sm:w-2/6 md:w-1/4 px-2 mb-7 lg:mb-0 flex justify-center">
+                <div className="flex flex-wrap justify-center lg:flex-col">
+                  {validUrls.map((image, index) => (
+                    <div
+                      className="w-1/2 sm:w-full mb-2 sm:mb-4 lg:mb-2 lg:w-full px-2 flex justify-center"
+                      key={index}
+                    >
+                      <div className="relative group block h-36 w-36 sm:h-24 sm:w-24 bg-blueGray-900 rounded-md cursor-pointer">
+                        <div className="absolute inset-0">
+                          <Image
+                            onMouseOver={() => handleSelect(index)}
+                            // ref={addRefs}
+                            className={
+                              selectedImageIndex === index
+                                ? "img-fluid w-full h-full object-cover border-blue-600 border-2 shadow-md rounded-md"
+                                : "img-fluid w-full h-full object-cover border border-gray-300 shadow-md rounded-md"
+                            }
+                            src={image}
+                            alt={`Thumbnail ${index}`}
+                            fill
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Main Image Section */}
+              <div className="w-full sm:w-4/6 md:w-3/4 px-4 h-auto sm:h-auto flex justify-center items-center">
+                <div className="relative group block h-80 w-80 xs:h-0 bg-blueGray-900 rounded-md">
+                  <div className="absolute inset-0 flex justify-center items-center rounded-md">
+                    <ImageMagnifier
+                      src={validUrls[selectedImageIndex]}
+                      height="1800"
+                      width="1800"
+                      zoomLevel={1.5}
+                      magnifierHeight={300}
+                      magnifieWidth={300}
+                      imageAlt="Selected Image"
+                      square={false}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
-              <img
-                src={product.images[2].src}
-                alt={product.images[2].alt}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
           </div>
-          <div className="aspect-h-5 aspect-w-4 lg:aspect-h-4 lg:aspect-w-3 sm:overflow-hidden sm:rounded-lg">
-            <img
-              src={product.images[3].src}
-              alt={product.images[3].alt}
-              className="h-full w-full object-cover object-center"
-            />
-          </div>
-        </div>
+        </MaxWidthWrapper>
 
         {/* Product info */}
         <div className="mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16">
           <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-              {product.name}
+              {prod?.attributes?.title}
             </h1>
           </div>
           <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
@@ -154,7 +175,11 @@ export default function Example() {
               <h3 className="sr-only">Description</h3>
 
               <div className="space-y-6">
-                <p className="text-base text-gray-900">{product.description}</p>
+                {prod?.attributes?.description?.map((paragraph, index) => (
+                  <p className="text-base text-gray-900" key={index}>
+                    {paragraph.children[0].text}
+                  </p>
+                ))}
               </div>
             </div>
 
@@ -163,9 +188,11 @@ export default function Example() {
 
               <div className="mt-4">
                 <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {product.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
+                  {prod?.attributes?.highlights?.map((paragraph, index) => (
+                    <li key={index} className="text-gray-400">
+                      <span className="text-gray-600">
+                        {paragraph.children[0].text}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -176,7 +203,11 @@ export default function Example() {
               <h2 className="text-sm font-medium text-gray-900">Details</h2>
 
               <div className="mt-4 space-y-6">
-                <p className="text-sm text-gray-600">{product.details}</p>
+                {prod?.attributes?.details?.map((paragraph, index) => (
+                  <p className="text-sm text-gray-600" key={index}>
+                    {paragraph.children[0].text}
+                  </p>
+                ))}
               </div>
             </div>
           </div>
@@ -184,7 +215,7 @@ export default function Example() {
           <div className="mt-4 lg:row-span-3 lg:mt-0">
             <h2 className="sr-only">Product information</h2>
             <p className="text-3xl tracking-tight text-gray-900">
-              {product.price}
+              {formatPrice(prod?.attributes?.price)}
             </p>
 
             {/* Reviews */}
@@ -229,9 +260,9 @@ export default function Example() {
                     Choose a color
                   </RadioGroup.Label>
                   <div className="flex items-center space-x-3">
-                    {product.colors.map((color) => (
+                    {colors?.map((color, index) => (
                       <RadioGroup.Option
-                        key={color.name}
+                        key={index}
                         value={color}
                         className={({
                           active,
@@ -285,7 +316,7 @@ export default function Example() {
                     Choose a size
                   </RadioGroup.Label>
                   <div className="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4">
-                    {product.sizes.map((size) => (
+                    {sizes.map((size) => (
                       <RadioGroup.Option
                         key={size.name}
                         value={size}
