@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ImageMagnifier from "@/components/ImageMagnifier";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { axiosConfig } from "@/config";
@@ -30,6 +30,8 @@ export default function ProductDetails() {
   const [validUrls, setValidUrls] = useState<string[]>([]); // State for valid image URLs
   const allSizes = ["XXS", "XS", "S", "M", "L", "XL", "2XL", "3XL"]; // Define all offered sizes
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const { cart, setCart } = useContext(CartContext);
+
   // get products
   useEffect(() => {
     const getLatestProducts = async () => {
@@ -115,6 +117,7 @@ export default function ProductDetails() {
       try {
         await axiosConfig.post("/carts", data).then((res) => {
           console.log("Added to Cart ", res);
+          setCart((cart) => [...cart, prod]);
         });
       } catch (error) {
         console.log("Error ", error);

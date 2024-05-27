@@ -18,7 +18,7 @@ const ProductSection = (props: ProductReelProps) => {
       axiosConfig
         .get("/products?populate=*&_sort=date:DESC&_limit=5")
         .then((res) => {
-          console.log(res.data.data);
+          // console.log(res.data.data);
           setProductList(res.data.data);
         })
         .catch((err) => {

@@ -1,17 +1,21 @@
-
+"use client";
 import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { Icons } from "./Icons";
 import NavItems from "./NavItems";
 import { buttonVariants } from "./ui/button";
 import Cart from "./Cart";
-import { auth } from "@clerk/nextjs";
+// import { auth } from "@clerk/nextjs";
 import UserButton from "./UserButton";
+// import { currentUser } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 
 const Navbar = () => {
-  const user = null;
-  const { userId } = auth();
+  // const user = await currentUser();
+  // const { userId } = auth();
   // console.log(userId);
+  const { user } = useUser();
+  console.log("USER: ",user?.id);
   return (
     <div className="bg-white sticky z-50 top-0 inset-x-0 h-16">
       <header className="relative bg-white">
@@ -31,7 +35,7 @@ const Navbar = () => {
               </div>
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {!userId && (
+                  {!user?.id && (
                     <>
                       <Link
                         href="/sign-in"
@@ -49,7 +53,7 @@ const Navbar = () => {
                       >
                         Create Account
                       </Link>
-                      
+
                       <div className="flex lg:ml-6">
                         <span
                           className="h-6 w-px bg-gray-200"
@@ -69,7 +73,7 @@ const Navbar = () => {
                   <div className="ml-auto">
                     <UserButton />
                   </div>
-                  
+
                   <div className="ml-4 flow-root lg:ml-6">
                     <Cart />
                   </div>

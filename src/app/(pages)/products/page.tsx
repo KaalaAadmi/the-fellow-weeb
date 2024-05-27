@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import ProductCard from "@/components/ProductCard";
 import { axiosConfig } from "@/config";
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 interface Product {
   id: number;
@@ -23,23 +23,23 @@ interface Product {
 }
 
 const page = () => {
-    const [products, setProducts] = useState<Product[]|null>(null)
-	const [validUrls, setValidUrls] = React.useState<string[]>([]);
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const [validUrls, setValidUrls] = React.useState<string[]>([]);
 
-    useEffect(() => {
-      const getLatestProducts = async () => {
-        axiosConfig
-          .get("/products?populate=*")
-          .then((res) => {
-            console.log(res.data.data);
-            setProducts(res.data.data);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      };
-      getLatestProducts();
-    }, []);
+  useEffect(() => {
+    const getLatestProducts = async () => {
+      axiosConfig
+        .get("/products?populate=*")
+        .then((res) => {
+          console.log(res.data.data);
+          setProducts(res.data.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    getLatestProducts();
+  }, []);
 
   return (
     <section>
@@ -430,8 +430,10 @@ const page = () => {
             {/* Products */}
             <div className="lg:col-span-3">
               <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                              {products?.map((product, index) => <ProductCard key={index} product={product} />)}
-                              {/* <li>
+                {products?.map((product, index) => (
+                  <ProductCard key={index} product={product} />
+                ))}
+                {/* <li>
                   <a href="#" className="group block overflow-hidden">
                     <img
                       src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
