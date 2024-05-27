@@ -1,38 +1,48 @@
 "use client";
-
 import { Icons } from "@/components/Icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useSignIn } from "@clerk/nextjs";
 
-import {
-  AuthCredentialsValidator,
-  TAuthCredentialsValidator,
-} from "@/lib/validators/account-credentials-validator";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const Page = () => {
+  const { isLoaded, signIn, setActive } = useSignIn();
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TAuthCredentialsValidator>({
-    resolver: zodResolver(AuthCredentialsValidator),
-  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isLoaded) {
+      return;
+    }
 
-  const onSubmit = ({ email, password }: TAuthCredentialsValidator) => {
-    // signIn({ email, password });
-    //   Sign in
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === "complete") {
+        console.log(result);
+        await setActive({ session: result.createdSessionId });
+        router.push("/");
+      } else {
+        /*Investigate why the sign-in hasn't completed */
+        console.log(result);
+      }
+    } catch (err: any) {
+      console.error("error", err.errors[0].longMessage);
+    }
   };
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <>
       <div className="container relative flex pt-20 flex-col items-center justify-center lg:px-0">
@@ -56,44 +66,36 @@ const Page = () => {
           </div>
 
           <div className="grid gap-6">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit}>
               <div className="grid gap-2">
                 <div className="grid gap-1 py-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
-                    {...register("email")}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className={cn({
-                      "focus-visible:ring-red-500": errors.email,
+                      "focus-visible:ring-red-500": email === "",
                     })}
                     placeholder="you@example.com"
                   />
-                  {errors?.email && (
-                    <p className="text-sm text-red-500">
-                      {errors.email.message}
-                    </p>
-                  )}
                 </div>
 
                 <div className="grid gap-1 py-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
-                    {...register("password")}
                     type="password"
                     className={cn({
-                      "focus-visible:ring-red-500": errors.password,
+                      "focus-visible:ring-red-500": password === "",
                     })}
                     placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
-                  {errors?.password && (
-                    <p className="text-sm text-red-500">
-                      {errors.password.message}
-                    </p>
-                  )}
                 </div>
               </div>
             </form>
 
-            <Button>Sign In</Button>
+            <Button onClick={handleSubmit}>Sign In</Button>
           </div>
         </div>
       </div>

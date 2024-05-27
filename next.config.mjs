@@ -14,6 +14,16 @@ const nextConfig = {
         // port: "3000",
         protocol: "https",
       },
+      {
+        hostname: "img.clerk.com",
+        pathname: "**",
+        protocol: "https",
+      },
+      {
+        hostname: "www.gravatar.com",
+        pathname: "**",
+        protocol: "https",
+      },
     ],
   },
 };

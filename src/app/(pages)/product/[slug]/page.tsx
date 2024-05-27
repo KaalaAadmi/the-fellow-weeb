@@ -7,7 +7,8 @@ import { formatPrice } from "@/lib/utils";
 import { RadioGroup } from "@headlessui/react";
 import { Star } from "lucide-react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 const reviews = { href: "#", average: 4, totalCount: 117 };
 
@@ -18,6 +19,8 @@ function classNames(...classes: any): any {
 export default function ProductDetails() {
   const path = usePathname();
   const id = path.split("/")[2];
+  const { user } = useUser();
+  const router = useRouter();
   // console.log(id);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -33,7 +36,7 @@ export default function ProductDetails() {
       axiosConfig
         .get(`/products/${id}?populate=*`)
         .then((res) => {
-          console.log(res.data.data);
+          // console.log(res.data.data);
           setProd(res.data.data);
         })
         .catch((err) => {
@@ -87,13 +90,39 @@ export default function ProductDetails() {
     getValidUrls();
   }, [prod]); // Update on product change
 
-  console.log(validUrls);
+  // console.log(validUrls);
 
   const handleSelect = (index: number) => {
     setSelectedImageIndex(index);
   };
+  console.log("Product: ", prod);
+  console.log("User: ", user?.fullName);
+  const onAddToCartClick = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    } else {
+      // TODO: logic for add to cart
+      const data = {
+        data: {
+          name: user?.fullName,
+          email: user?.primaryEmailAddress?.emailAddress,
+          products: prod?.id,
+        },
+      };
+      console.log("Data ", data);
+      try {
+        await axiosConfig.post("/carts", data).then((res) => {
+          console.log("Added to Cart ", res);
+        });
+      } catch (error) {
+        console.log("Error ", error);
+      }
+    }
+  };
 
-  console.log(selectedImageIndex);
+  // console.log(selectedImageIndex);
   return (
     <div className="bg-white">
       <div className="pt-6">
@@ -385,6 +414,9 @@ export default function ProductDetails() {
               <button
                 type="submit"
                 className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-8 py-3 text-base font-medium text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={() => {
+                  onAddToCartClick(event);
+                }}
               >
                 Add to bag
               </button>

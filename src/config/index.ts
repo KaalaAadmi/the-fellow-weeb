@@ -44,6 +44,7 @@ export const PRODUCT_CATEGORIES = [
     ],
   },
 ];
+
 const apiKey = process.env.NEXT_PUBLIC_REST_API_KEY;
 export const BASE_URL = "http://localhost:1400/api";
 

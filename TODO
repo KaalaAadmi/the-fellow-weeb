@@ -5,6 +5,7 @@ MAKE PAGES: @done
   - Shipping Policy -> /shipping-policy @done
   - Returns and Cancellations Policy -> /returns-policy @done
   - Size Guide -> /size-guide @done
+  - FAQ -> /faq @done
  
 STRAPI: @done
   - add sizes in products @done
@@ -17,6 +18,11 @@ GENERAL: @done
     - Terms and Condition add @done
   - Shipping Policy add @done
   - Returns and Cancellations add @done
+  - Authentication @done
+  - User Profile button in NavBar @done
+    - add image to the dropdown menu @done
+  - Profile Page 
+
 
 FOOTER: @done
   - About Us @done
@@ -28,8 +34,13 @@ FOOTER: @done
     - Facebook @done
     - Tiktok @done  
 
-Sing Up Page:
-  - add fields like name, etc
+Sign Up Page: @done
+  - add fields like name, etc @done
 
 Products in HomeScreen:
   - get latest products
+
+Login and Register(custom buttons):
+  - using google
+  - using apple
+  - using facebook

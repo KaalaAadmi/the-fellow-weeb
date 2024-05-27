@@ -1,3 +1,5 @@
+// Username: hello@hello.com
+// Password: HelloWorld@987654
 import Footer from "@/components/Footer";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Perks from "@/components/Perks";
